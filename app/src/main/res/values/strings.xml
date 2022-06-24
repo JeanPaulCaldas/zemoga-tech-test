@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Posts</string>
+
+    <string name="posts_pager_all_tab">All</string>
+    <string name="posts_pager_fav_tab">Favorites</string>
+    <string name="favorite_icon_description">Favorite icon</string>
+    <string name="arrow_icon_description">Arrow icon</string>
+</resources>
