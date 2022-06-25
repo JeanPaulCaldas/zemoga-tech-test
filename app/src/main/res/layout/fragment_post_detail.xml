@@ -15,18 +15,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                android:text="@string/post_detail_description_title" />
+                android:text="@string/post_detail_description_title"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5" />
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="8dp"/>
+                android:layout_height="8dp" />
 
             <TextView
                 android:id="@+id/txt_description"
@@ -47,18 +47,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                android:text="@string/post_detail_author_title" />
+                android:text="@string/post_detail_author_title"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5" />
 
             <Space
                 android:layout_width="match_parent"
-                android:layout_height="8dp"/>
+                android:layout_height="8dp" />
 
             <TextView
                 android:id="@+id/txt_name"
@@ -89,34 +89,28 @@
     </com.google.android.material.card.MaterialCardView>
 
     <!--COMMENTS-->
-    <com.google.android.material.card.MaterialCardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp">
+        android:layout_margin="8dp"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:text="@string/post_detail_comments_title"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                android:text="@string/post_detail_comments_title" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="8dp"/>
+        <ListView
+            android:id="@+id/list_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-            <ListView
-                android:id="@+id/list_comments"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 
 </LinearLayout>

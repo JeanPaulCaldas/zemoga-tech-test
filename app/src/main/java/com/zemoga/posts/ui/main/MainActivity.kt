@@ -1,8 +1,11 @@
 package com.zemoga.posts.ui.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.google.android.material.tabs.TabLayoutMediator
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.zemoga.posts.R
 import com.zemoga.posts.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -14,19 +17,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater).setup()
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
     }
 
-    private fun ActivityMainBinding.setup() = this.apply {
-
-        pager.adapter = PostPagerAdapter(this@MainActivity)
-
-        TabLayoutMediator(tabLayout, pager) { tab, position ->
-            val tabTitle =
-                if (position == 0) R.string.posts_pager_all_tab else R.string.posts_pager_fav_tab
-            tab.setText(tabTitle)
-        }.attach()
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment)
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
 

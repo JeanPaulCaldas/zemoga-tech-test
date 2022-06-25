@@ -1,15 +1,12 @@
 package com.zemoga.posts.framework.database
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
 
-    @Query("SELECT * FROM Post")
+    @Query("SELECT * FROM Post ORDER BY favorite DESC, id")
     fun getAll(): Flow<List<Post>>
 
     @Query("SELECT * FROM Post WHERE favorite")
@@ -23,5 +20,14 @@ interface PostDao {
 
     @Query("SELECT * FROM Post WHERE id == :postId")
     suspend fun getPost(postId: Int): Post
+
+    @Delete
+    suspend fun deletePost(post: Post)
+
+    @Query("DELETE FROM Post")
+    suspend fun deleteAllPosts()
+
+    @Update
+    suspend fun updatePost(post: Post)
 
 }

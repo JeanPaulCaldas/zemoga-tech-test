@@ -36,15 +36,15 @@ class PostCacheImpl(private val postDao: PostDao) : PostCacheSource {
         }
     }
 
-    override suspend fun deleteNoFavoritePosts() {
-        TODO("Not yet implemented")
+    override suspend fun deleteAllPosts() {
+        postDao.deleteAllPosts()
     }
 
-    override suspend fun toggleFavoriteStatus(post: Post) {
-        TODO("Not yet implemented")
+    override suspend fun updatePost(post: Post) {
+        postDao.updatePost(post.toRoom())
     }
 
     override suspend fun deletePost(post: Post) {
-        TODO("Not yet implemented")
+        postDao.deletePost(post.toRoom())
     }
 }

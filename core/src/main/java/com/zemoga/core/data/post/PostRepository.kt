@@ -28,12 +28,11 @@ class PostRepository(
     }
 
     suspend fun deleteCachedPosts() {
-        cacheSource.deleteNoFavoritePosts()
+        cacheSource.deleteAllPosts()
     }
 
     suspend fun toggleFavoritePostStatus(post: Post) {
-        cacheSource.toggleFavoriteStatus(post)
-
+        cacheSource.updatePost(post.copy(favorite = post.favorite.not()))
     }
 
     suspend fun deletePost(post: Post) {

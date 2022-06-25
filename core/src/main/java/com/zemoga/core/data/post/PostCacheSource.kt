@@ -9,7 +9,7 @@ interface PostCacheSource {
     suspend fun getPost(postId: Int): Post
     suspend fun isEmpty(): Boolean
     suspend fun persistPosts(posts: List<Post>)
-    suspend fun deleteNoFavoritePosts()
-    suspend fun toggleFavoriteStatus(post: Post)
+    suspend fun deleteAllPosts()
+    suspend fun updatePost(post: Post)
     suspend fun deletePost(post: Post)
 }
