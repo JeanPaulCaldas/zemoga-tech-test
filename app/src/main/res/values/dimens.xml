@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="card_margin">8dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+    <dimen name="title_bottom_space">8dp</dimen>
+    <dimen name="comments_margin">8dp</dimen>
+    <dimen name="comments_padding">16dp</dimen>
+
+    <dimen name="item_post_margin">4dp</dimen>
+    <dimen name="item_post_icon_margin">8dp</dimen>
 </resources>

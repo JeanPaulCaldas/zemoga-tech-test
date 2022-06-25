@@ -19,4 +19,7 @@
     <string name="menu_action_favorite_title">Favorite Post</string>
     <string name="menu_action_delete_title">Delete Post</string>
     <string name="menu_action_delete_all">Delete All Post</string>
+
+    <string name="error_message">An unexpected error has occurred</string>
+
 </resources>

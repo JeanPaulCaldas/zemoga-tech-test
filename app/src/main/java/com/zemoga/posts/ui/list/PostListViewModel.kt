@@ -7,7 +7,10 @@ import com.zemoga.core.usecase.DeleteAllPosts
 import com.zemoga.core.usecase.GetAllPosts
 import com.zemoga.core.usecase.SyncPosts
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -15,19 +18,19 @@ import javax.inject.Named
 @HiltViewModel
 class PostListViewModel @Inject constructor(
     @Named("favorite") private val favorite: Boolean,
-    private val getAllUseCase: GetAllPosts,
-    private val deleteAllUseCase: DeleteAllPosts,
+    private val getAllPosts: GetAllPosts,
+    private val deleteAllPosts: DeleteAllPosts,
     private val syncPosts: SyncPosts
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(PostListUIState())
+    private val _uiState = MutableStateFlow<PostListUIState>(PostListUIState.Posts())
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            getAllUseCase(favorites = favorite).onEach { posts ->
-                _uiState.update { it.copy(posts = posts) }
-            }.collect()
+            getAllPosts(favorites = favorite)
+                .onSuccess { it.onEach(::updateState).collect() }
+                .onFailure(::emitError)
         }
     }
 
@@ -36,21 +39,37 @@ class PostListViewModel @Inject constructor(
         PostListEvent.Refresh -> refreshAction()
     }
 
+    //region Private Methods
+    private fun updateState(posts: List<Post>) {
+        _uiState.value = PostListUIState.Posts(posts)
+    }
+
+    private fun emitError(throwable: Throwable) {
+        _uiState.value = PostListUIState.Error(throwable)
+    }
+
     private fun refreshAction() {
-        viewModelScope.launch { syncPosts() }
+        viewModelScope.launch {
+            syncPosts().onFailure(::emitError)
+        }
     }
 
     private fun deleteAction() {
-        viewModelScope.launch { deleteAllUseCase() }
+        viewModelScope.launch {
+            deleteAllPosts().onFailure(::emitError)
+        }
     }
+    //endregion
 
+    //region Event Classes
     sealed class PostListEvent {
         object DeleteAll : PostListEvent()
         object Refresh : PostListEvent()
     }
 
-    data class PostListUIState(
-        val posts: List<Post> = listOf()
-    )
-
+    sealed class PostListUIState {
+        data class Posts(val posts: List<Post> = listOf()) : PostListUIState()
+        data class Error(val throwable: Throwable? = null) : PostListUIState()
+    }
+    //endregion
 }

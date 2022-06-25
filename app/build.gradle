@@ -10,7 +10,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.zemoga.postscodetest"
+        applicationId "com.zemoga.posts"
         minSdk 26
         targetSdk 32
         versionCode 1
@@ -46,7 +46,6 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
 
     //Coroutines
     def coroutines_version = "1.6.0"

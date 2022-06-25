@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -12,7 +11,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zemoga.posts.R
 import com.zemoga.posts.databinding.FragmentPostListBinding
-import com.zemoga.posts.ui.detail.PostDetailFragment
 import com.zemoga.posts.ui.list.PostListViewModel.PostListEvent.DeleteAll
 import com.zemoga.posts.ui.list.PostListViewModel.PostListEvent.Refresh
 import com.zemoga.posts.ui.pager.PagerFragmentDirections
@@ -24,12 +22,15 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class PostsListFragment : Fragment() {
 
+    //region Properties
     private val viewModel: PostListViewModel by viewModels()
 
     private var _binding: FragmentPostListBinding? = null
     private val binding get() = _binding!!
     private lateinit var recyclerAdapter: PostRecyclerViewAdapter
+    //endregion
 
+    //region Fragment Overrides
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -77,16 +78,28 @@ class PostsListFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+    //endregion
 
-    private fun render(it: PostListViewModel.PostListUIState) {
-        recyclerAdapter.submitList(it.posts)
+    //region Private Methods
+    private fun render(uiState: PostListViewModel.PostListUIState) {
+        when (uiState) {
+            is PostListViewModel.PostListUIState.Error -> showError()
+            is PostListViewModel.PostListUIState.Posts -> recyclerAdapter.submitList(uiState.posts)
+        }
+    }
+
+    private fun showError() {
+        Toast.makeText(requireContext(), getString(R.string.error_message), Toast.LENGTH_SHORT)
+            .show()
     }
 
     private fun goToPostDetail(postId: Int) {
         val action = PagerFragmentDirections.actionPagerFragmentToPostDetailFragment(postId)
         findNavController().navigate(action)
     }
+    //endregion
 
+    //region Static
     companion object {
         const val FAVORITE = "PostsListFragment.Favorite"
 
@@ -98,4 +111,5 @@ class PostsListFragment : Fragment() {
                 }
             }
     }
+    //endregion
 }

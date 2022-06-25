@@ -4,8 +4,8 @@ import com.zemoga.core.data.post.PostRepository
 import com.zemoga.core.domain.Post
 
 class TogglePostFavorite(private val repository: PostRepository) {
-    suspend operator fun invoke(post:Post):Post {
+    suspend operator fun invoke(post: Post) = resultOf {
         repository.toggleFavoritePostStatus(post)
-        return repository.getPost(post.id)
+        repository.getPost(post.id)
     }
 }

@@ -22,18 +22,18 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class PostDetailFragment : Fragment() {
 
+    //region Properties
     private val viewModel: PostDetailViewModel by viewModels()
 
     private var _binding: FragmentPostDetailBinding? = null
     private val binding get() = _binding!!
 
     private val adapter by lazy {
-        ArrayAdapter<String>(
-            requireContext(),
-            android.R.layout.simple_list_item_1
-        )
+        ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
     }
+    //endregion
 
+    //region Fragment Overrides
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -54,6 +54,15 @@ class PostDetailFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.onEach(::render).collect()
+            }
+        }
+
+        viewModel.actionState.observe(viewLifecycleOwner) {
+            when (it) {
+                is PostDetailViewModel.PostDetailActionState.Error -> showError()
+                PostDetailViewModel.PostDetailActionState.NavigateOut -> {
+                    findNavController().popBackStack()
+                }
             }
         }
     }
@@ -88,13 +97,10 @@ class PostDetailFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+    //endregion
 
+    //region Private Methods
     private fun render(uiState: PostDetailViewModel.PostDetailUiState) {
-        if (uiState.navigateOut) {
-            findNavController().popBackStack()
-            return
-        }
-
         adapter.clear()
         adapter.addAll(uiState.comments)
 
@@ -110,4 +116,10 @@ class PostDetailFragment : Fragment() {
             binding.txtWebsite.text = getString(R.string.post_detail_author_website, it.website)
         }
     }
+
+    private fun showError() {
+        Toast.makeText(requireContext(), getString(R.string.error_message), Toast.LENGTH_SHORT)
+            .show()
+    }
+    //endregion
 }

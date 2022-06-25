@@ -23,7 +23,9 @@ class PostCacheImpl(private val postDao: PostDao) : PostCacheSource {
         }
 
     override suspend fun getPost(postId: Int): Post =
-        postDao.getPost(postId).toDomain()
+        withContext(Dispatchers.IO) {
+            postDao.getPost(postId).toDomain()
+        }
 
     override suspend fun isEmpty(): Boolean =
         withContext(Dispatchers.IO) {
@@ -37,14 +39,20 @@ class PostCacheImpl(private val postDao: PostDao) : PostCacheSource {
     }
 
     override suspend fun deleteAllPosts() {
-        postDao.deleteAllPosts()
+        withContext(Dispatchers.IO) {
+            postDao.deleteAllPosts()
+        }
     }
 
     override suspend fun updatePost(post: Post) {
-        postDao.updatePost(post.toRoom())
+        withContext(Dispatchers.IO) {
+            postDao.updatePost(post.toRoom())
+        }
     }
 
     override suspend fun deletePost(post: Post) {
-        postDao.deletePost(post.toRoom())
+        withContext(Dispatchers.IO) {
+            postDao.deletePost(post.toRoom())
+        }
     }
 }
