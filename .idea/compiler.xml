@@ -2,7 +2,6 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
-      <module name="Posts.app" target="11" />
       <module name="Posts_Code_Test.app" target="11" />
     </bytecodeTargetLevel>
   </component>

@@ -17,7 +17,7 @@
         android:theme="@style/Theme.PostsCodeTest"
         tools:targetApi="31">
         <activity
-            android:name="com.zemoga.posts.ui.MainActivity"
+            android:name="com.zemoga.posts.ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

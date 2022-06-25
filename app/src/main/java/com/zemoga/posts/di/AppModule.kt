@@ -2,9 +2,11 @@ package com.zemoga.posts.di
 
 import android.app.Application
 import androidx.room.Room
-import com.zemoga.core.data.PostCacheSource
+import com.zemoga.core.data.author.AuthorCacheSource
+import com.zemoga.core.data.post.PostCacheSource
+import com.zemoga.posts.framework.AuthorCacheImpl
 import com.zemoga.posts.framework.database.PostDatabase
-import com.zemoga.posts.framework.database.RoomDataSource
+import com.zemoga.posts.framework.PostCacheImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,5 +23,8 @@ class AppModule {
         Room.databaseBuilder(app, PostDatabase::class.java, "post-db").build()
 
     @Provides
-    fun cacheDataSourceProvider(db: PostDatabase): PostCacheSource = RoomDataSource(db.postDao())
+    fun postCacheProvider(db: PostDatabase): PostCacheSource = PostCacheImpl(db.postDao())
+
+    @Provides
+    fun authorCacheProvider(db: PostDatabase): AuthorCacheSource = AuthorCacheImpl(db.authorDao())
 }

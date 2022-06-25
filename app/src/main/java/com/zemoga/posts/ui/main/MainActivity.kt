@@ -1,4 +1,4 @@
-package com.zemoga.posts.ui
+package com.zemoga.posts.ui.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

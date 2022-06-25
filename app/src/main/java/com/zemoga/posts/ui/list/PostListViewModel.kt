@@ -1,19 +1,19 @@
-package com.zemoga.posts.ui.postlist
+package com.zemoga.posts.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zemoga.core.domain.Post
-import com.zemoga.core.usecase.GetPosts
+import com.zemoga.core.usecase.GetAllPosts
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class PostListViewModel @Inject constructor(
-    //private val favorites: Boolean,
-    private val postsUseCase: GetPosts
+    @Named("favorite") private val favorite: Boolean,
+    private val postsUseCase: GetAllPosts
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PostListUIState())
@@ -21,14 +21,14 @@ class PostListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            postsUseCase.invoke(favorites = false)
-                .onEach { posts ->
-                    _uiState.update { it.copy(posts = posts) }
-                }.collect()
+            postsUseCase(favorites = favorite).onEach { posts ->
+                _uiState.update { it.copy(posts = posts) }
+            }.collect()
         }
     }
-}
 
-data class PostListUIState(
-    val posts: List<Post> = listOf()
-)
+    data class PostListUIState(
+        val posts: List<Post> = listOf()
+    )
+
+}

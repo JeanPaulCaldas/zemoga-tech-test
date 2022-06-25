@@ -1,7 +1,10 @@
 package com.zemoga.posts.di
 
-import com.zemoga.core.data.PostRemoteSource
-import com.zemoga.posts.framework.JsonPlaceHolderDataSource
+import com.zemoga.core.data.author.AuthorRemoteSource
+import com.zemoga.core.data.post.PostRemoteSource
+import com.zemoga.posts.framework.AuthorRemoteImpl
+import com.zemoga.posts.framework.PostRemoteImpl
+import com.zemoga.posts.framework.server.AuthorService
 import com.zemoga.posts.framework.server.PostService
 import dagger.Module
 import dagger.Provides
@@ -32,9 +35,19 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun providePostService(retrofit: Retrofit) = retrofit.create(PostService::class.java)
+    fun providePostService(retrofit: Retrofit): PostService =
+        retrofit.create(PostService::class.java)
 
     @Provides
-    fun remoteDataSourceProvider(postService: PostService): PostRemoteSource =
-        JsonPlaceHolderDataSource(postService)
+    fun postRemoteImplProvider(service: PostService): PostRemoteSource =
+        PostRemoteImpl(service)
+
+    @Provides
+    @Singleton
+    fun provideAuthorService(retrofit: Retrofit): AuthorService =
+        retrofit.create(AuthorService::class.java)
+
+    @Provides
+    fun authorRemoteImplProvider(service: AuthorService): AuthorRemoteSource =
+        AuthorRemoteImpl(service)
 }

@@ -1,15 +1,17 @@
-package com.zemoga.posts.ui.postlist
+package com.zemoga.posts.ui.list
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zemoga.posts.databinding.FragmentPostListBinding
+import com.zemoga.posts.ui.detail.PostDetailFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -22,21 +24,14 @@ class PostsListFragment : Fragment() {
 
     private var _binding: FragmentPostListBinding? = null
     private val binding get() = _binding!!
-    private var favoriteView = false
     private lateinit var recyclerAdapter: PostRecyclerViewAdapter
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let { favoriteView = it.getBoolean(ARG_FAV_VIEW) }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPostListBinding.inflate(inflater, container, false).apply {
-            recyclerAdapter = PostRecyclerViewAdapter()
+            recyclerAdapter = PostRecyclerViewAdapter(::goToPostDetail)
             recycler.adapter = recyclerAdapter
         }
         return binding.root
@@ -46,12 +41,7 @@ class PostsListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.uiState
-                        .onEach {
-                            recyclerAdapter.submitList(it.posts)
-                        }.collect()
-                }
+                viewModel.uiState.onEach { render(it) }.collect()
             }
         }
     }
@@ -61,15 +51,24 @@ class PostsListFragment : Fragment() {
         _binding = null
     }
 
-    companion object {
+    private fun render(it: PostListViewModel.PostListUIState) {
+        recyclerAdapter.submitList(it.posts)
+    }
 
-        private const val ARG_FAV_VIEW = "favorite_view"
+    private fun goToPostDetail(postId:Int){
+        parentFragmentManager.commit {
+            add(PostDetailFragment.newInstance(postId), "post_detail_fragment")
+        }
+    }
+
+    companion object {
+        const val FAVORITE = "PostsListFragment.Favorite"
 
         @JvmStatic
         fun newInstance(favoriteView: Boolean) =
             PostsListFragment().apply {
                 arguments = Bundle().apply {
-                    putBoolean(ARG_FAV_VIEW, favoriteView)
+                    putBoolean(FAVORITE, favoriteView)
                 }
             }
     }

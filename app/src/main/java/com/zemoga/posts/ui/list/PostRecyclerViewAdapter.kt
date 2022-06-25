@@ -1,4 +1,4 @@
-package com.zemoga.posts.ui.postlist
+package com.zemoga.posts.ui.list
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zemoga.core.domain.Post
 import com.zemoga.posts.databinding.ItemPostBinding
 
-class PostRecyclerViewAdapter : ListAdapter<Post, PostRecyclerViewAdapter.ViewHolder>(PostDiff) {
+class PostRecyclerViewAdapter(private val onClick: (postId: Int) -> Unit) :
+    ListAdapter<Post, PostRecyclerViewAdapter.ViewHolder>(PostDiff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -26,8 +27,7 @@ class PostRecyclerViewAdapter : ListAdapter<Post, PostRecyclerViewAdapter.ViewHo
         fun bind(post: Post) = binding.apply {
             favoriteIcon.visible = post.favorite
             title.text = post.title
-            this.root.setOnClickListener { }
-
+            this.root.setOnClickListener { onClick(post.id) }
         }
     }
 
@@ -35,7 +35,6 @@ class PostRecyclerViewAdapter : ListAdapter<Post, PostRecyclerViewAdapter.ViewHo
 
 private var View.visible: Boolean
     get() = this.visibility == View.VISIBLE
-
     set(show) {
         this.visibility = if (show.not()) View.GONE else View.VISIBLE
     }

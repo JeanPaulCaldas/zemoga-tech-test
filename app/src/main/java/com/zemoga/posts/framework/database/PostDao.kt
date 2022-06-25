@@ -10,12 +10,18 @@ import kotlinx.coroutines.flow.Flow
 interface PostDao {
 
     @Query("SELECT * FROM Post")
-    fun getAll():Flow<List<Post>>
+    fun getAll(): Flow<List<Post>>
+
+    @Query("SELECT * FROM Post WHERE favorite")
+    fun getFavorites(): Flow<List<Post>>
 
     @Query("SELECT COUNT(id) FROM Post")
-    suspend fun postCount():Int
+    suspend fun postCount(): Int
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(posts:List<Post>)
+    suspend fun insert(posts: List<Post>)
+
+    @Query("SELECT * FROM Post WHERE id == :postId")
+    suspend fun getPost(postId: Int): Post
 
 }

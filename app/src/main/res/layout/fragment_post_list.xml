@@ -6,5 +6,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".ui.postlist.PostsListFragment"
+    tools:context=".ui.list.PostsListFragment"
     tools:listitem="@layout/item_post" />

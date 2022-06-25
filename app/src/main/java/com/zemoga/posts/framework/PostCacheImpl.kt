@@ -1,22 +1,29 @@
-package com.zemoga.posts.framework.database
+package com.zemoga.posts.framework
 
-import com.zemoga.core.data.PostCacheSource
+import com.zemoga.core.data.post.PostCacheSource
+import com.zemoga.core.domain.Author
 import com.zemoga.core.domain.Post
-import com.zemoga.posts.framework.toDomain
-import com.zemoga.posts.framework.toRoom
+import com.zemoga.posts.framework.database.AuthorDao
+import com.zemoga.posts.framework.database.PostDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-class RoomDataSource(private val postDao: PostDao) : PostCacheSource {
+class PostCacheImpl(private val postDao: PostDao) : PostCacheSource {
 
     override val allPosts: Flow<List<Post>>
         get() = postDao.getAll().map { entities ->
             entities.map { it.toDomain() }
         }
+
     override val favoritePosts: Flow<List<Post>>
-        get() = TODO("Not yet implemented")
+        get() = postDao.getFavorites().map { entities ->
+            entities.map { it.toDomain() }
+        }
+
+    override suspend fun getPost(postId: Int): Post =
+        postDao.getPost(postId).toDomain()
 
     override suspend fun isEmpty(): Boolean =
         withContext(Dispatchers.IO) {
@@ -24,7 +31,7 @@ class RoomDataSource(private val postDao: PostDao) : PostCacheSource {
         }
 
     override suspend fun persistPosts(posts: List<Post>) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             postDao.insert(posts.map { it.toRoom() })
         }
     }

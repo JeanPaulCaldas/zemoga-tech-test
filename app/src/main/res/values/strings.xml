@@ -5,4 +5,7 @@
     <string name="posts_pager_fav_tab">Favorites</string>
     <string name="favorite_icon_description">Favorite icon</string>
     <string name="arrow_icon_description">Arrow icon</string>
+    <string name="post_detail_description_title">Description</string>
+    <string name="post_detail_author_title">Author</string>
+    <string name="post_detail_comments_title">Comments</string>
 </resources>
