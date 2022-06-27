@@ -1,11 +1,11 @@
-package com.zemoga.posts.framework
+package com.zemoga.posts.framework.util
 
 import com.zemoga.core.domain.Author as DomainAuthor
 import com.zemoga.core.domain.Post as DomainPost
-import com.zemoga.posts.framework.database.Author as RoomAuthor
-import com.zemoga.posts.framework.database.Post as RoomPost
-import com.zemoga.posts.framework.server.Author as ServerAuthor
-import com.zemoga.posts.framework.server.Post as ServerPost
+import com.zemoga.posts.framework.room.entities.Author as RoomAuthor
+import com.zemoga.posts.framework.room.entities.Post as RoomPost
+import com.zemoga.posts.framework.retrofit.entities.Author as ServerAuthor
+import com.zemoga.posts.framework.retrofit.entities.Post as ServerPost
 
 internal fun RoomPost.toDomain() = DomainPost(
     id = id,

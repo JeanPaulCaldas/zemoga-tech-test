@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zemoga.core.domain.Post
 import com.zemoga.posts.databinding.ItemPostBinding
+import com.zemoga.posts.ui.util.visible
 
 class PostRecyclerViewAdapter(private val onClick: (postId: Int) -> Unit) :
     ListAdapter<Post, PostRecyclerViewAdapter.ViewHolder>(PostDiff) {
@@ -32,12 +33,6 @@ class PostRecyclerViewAdapter(private val onClick: (postId: Int) -> Unit) :
     }
 
 }
-
-private var View.visible: Boolean
-    get() = this.visibility == View.VISIBLE
-    set(show) {
-        this.visibility = if (show.not()) View.GONE else View.VISIBLE
-    }
 
 internal object PostDiff : DiffUtil.ItemCallback<Post>() {
     override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean =

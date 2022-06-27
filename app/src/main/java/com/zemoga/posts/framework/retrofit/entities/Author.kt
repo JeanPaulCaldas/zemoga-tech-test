@@ -1,4 +1,4 @@
-package com.zemoga.posts.framework.server
+package com.zemoga.posts.framework.retrofit.entities
 
 data class Author(
     val id:Int,

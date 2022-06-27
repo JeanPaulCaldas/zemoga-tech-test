@@ -1,8 +1,9 @@
-package com.zemoga.posts.framework
+package com.zemoga.posts.framework.author
 
 import com.zemoga.core.data.author.AuthorRemoteSource
 import com.zemoga.core.domain.Author
-import com.zemoga.posts.framework.server.AuthorService
+import com.zemoga.posts.framework.retrofit.services.AuthorService
+import com.zemoga.posts.framework.util.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

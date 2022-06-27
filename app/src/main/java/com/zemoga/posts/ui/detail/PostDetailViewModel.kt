@@ -1,7 +1,5 @@
 package com.zemoga.posts.ui.detail
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zemoga.core.domain.Author
 import com.zemoga.core.domain.Post
@@ -9,9 +7,9 @@ import com.zemoga.core.usecase.DeletePost
 import com.zemoga.core.usecase.GetPostComments
 import com.zemoga.core.usecase.GetPostDetails
 import com.zemoga.core.usecase.TogglePostFavorite
+import com.zemoga.posts.ui.base.BaseViewModel
+import com.zemoga.posts.ui.detail.PostDetailContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,86 +17,68 @@ import javax.inject.Named
 
 @HiltViewModel
 class PostDetailViewModel @Inject constructor(
-    @Named("postId") private val postId: Int,
     private val getDetails: GetPostDetails,
     private val getPostComments: GetPostComments,
     private val deletePost: DeletePost,
     private val toggleFavorite: TogglePostFavorite
-) : ViewModel() {
+) : BaseViewModel<Event, State, Effect>() {
 
-    private val _actionState = MutableLiveData<PostDetailActionState>()
-    val actionState get() = _actionState
+    //region MVI Contract
+    override fun createInitialState(): State {
+        return State()
+    }
 
-    private val _uiState = MutableStateFlow(PostDetailUiState())
-    val uiState = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            getDetails(postId).onFailure(::emitError)
-                .onSuccess(::updateStatus)
-
-            getPostComments(postId).onFailure(::emitError)
-                .onSuccess(::updateStatus)
+    override fun handleEvent(event: Event) {
+        when (event) {
+            Event.DeletePost -> delete()
+            is Event.GetDetails -> getPostDetails(event.postId)
+            Event.ToggleFavorite -> toggle()
         }
     }
-
-    fun setEvent(event: PostDetailEvent): Unit = when (event) {
-        PostDetailEvent.DeletePost -> deleteAction()
-        PostDetailEvent.ToggleFavorite -> toggleAction()
-    }
+    //endregion
 
     //region Private Methods
-    private fun toggleAction() {
+    private fun getPostDetails(postId: Int) {
         viewModelScope.launch {
-            toggleFavorite(_uiState.value.post!!).onFailure(::emitError)
-                .onSuccess { post ->
-                    _uiState.update { it.copy(post = post) }
-                }
+            getDetails(postId).onFailure { emitError() }
+                .onSuccess(::updateStatus)
+
+            getPostComments(postId).onFailure { emitError() }
+                .onSuccess(::updateStatus)
         }
     }
 
-    private fun deleteAction() {
+    private fun toggle() {
         viewModelScope.launch {
-            deletePost(_uiState.value.post!!).onFailure(::emitError)
-            _actionState.value = PostDetailActionState.NavigateOut
+            currentState.post?.let { post ->
+                toggleFavorite(post).onFailure { emitError() }
+                    .onSuccess {
+                        setState { copy(post = it) }
+                    }
+            }
+        }
+    }
+
+    private fun delete() {
+        viewModelScope.launch {
+            currentState.post?.let {
+                deletePost(it).onFailure { emitError() }
+                setEffect { Effect.NavigateOut }
+            }
         }
     }
 
     private fun updateStatus(details: Pair<Post, Author>) {
         val (post, author) = details
-        _uiState.update {
-            it.copy(post = post, author = author)
-        }
+        setState { copy(post = post, author = author) }
     }
 
     private fun updateStatus(comments: List<String>) {
-        _uiState.update {
-            it.copy(comments = comments)
-        }
+        setState { copy(comments = comments) }
     }
 
-    private fun emitError(throwable: Throwable) {
-        _actionState.value = PostDetailActionState.Error(throwable)
-    }
-    //endregion
-
-    //region Event Classes
-    sealed class PostDetailActionState {
-        object NavigateOut : PostDetailActionState()
-        data class Error(val throwable: Throwable? = null) : PostDetailActionState()
-    }
-
-    data class PostDetailUiState(
-        val comments: List<String> = listOf(),
-        val post: Post? = null,
-        val author: Author? = null
-    ) {
-        val isFavoritePost: Boolean get() = post?.favorite ?: false
-    }
-
-    sealed class PostDetailEvent {
-        object ToggleFavorite : PostDetailEvent()
-        object DeletePost : PostDetailEvent()
+    private fun emitError() {
+        setEffect { Effect.ShowError }
     }
     //endregion
 }

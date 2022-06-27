@@ -1,14 +1,13 @@
 package com.zemoga.posts.ui.list
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zemoga.core.domain.Post
 import com.zemoga.core.usecase.DeleteAllPosts
 import com.zemoga.core.usecase.GetAllPosts
 import com.zemoga.core.usecase.SyncPosts
+import com.zemoga.posts.ui.base.BaseViewModel
+import com.zemoga.posts.ui.list.PostListContract.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -21,55 +20,51 @@ class PostListViewModel @Inject constructor(
     private val getAllPosts: GetAllPosts,
     private val deleteAllPosts: DeleteAllPosts,
     private val syncPosts: SyncPosts
-) : ViewModel() {
+) : BaseViewModel<Event, State, Effect>() {
 
-    private val _uiState = MutableStateFlow<PostListUIState>(PostListUIState.Posts())
-    val uiState = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            getAllPosts(favorites = favorite)
-                .onSuccess { it.onEach(::updateState).collect() }
-                .onFailure(::emitError)
-        }
+    //region MVI Contract
+    override fun createInitialState(): State {
+        return State(PostListState.Idle)
     }
 
-    fun setEvent(event: PostListEvent): Unit = when (event) {
-        PostListEvent.DeleteAll -> deleteAction()
-        PostListEvent.Refresh -> refreshAction()
-    }
-
-    //region Private Methods
-    private fun updateState(posts: List<Post>) {
-        _uiState.value = PostListUIState.Posts(posts)
-    }
-
-    private fun emitError(throwable: Throwable) {
-        _uiState.value = PostListUIState.Error(throwable)
-    }
-
-    private fun refreshAction() {
-        viewModelScope.launch {
-            syncPosts().onFailure(::emitError)
-        }
-    }
-
-    private fun deleteAction() {
-        viewModelScope.launch {
-            deleteAllPosts().onFailure(::emitError)
+    override fun handleEvent(event: Event) {
+        setState { copy(state = PostListState.Loading) }
+        when (event) {
+            Event.GetAll -> getAll()
+            Event.DeleteAll -> deleteAll()
+            Event.Refresh -> refresh()
         }
     }
     //endregion
 
-    //region Event Classes
-    sealed class PostListEvent {
-        object DeleteAll : PostListEvent()
-        object Refresh : PostListEvent()
+    //region Private Methods
+    private fun updateState(posts: List<Post>) {
+        setState { copy(state = PostListState.Success(posts)) }
     }
 
-    sealed class PostListUIState {
-        data class Posts(val posts: List<Post> = listOf()) : PostListUIState()
-        data class Error(val throwable: Throwable? = null) : PostListUIState()
+    private fun emitError() {
+        setState { copy(state = PostListState.Idle) }
+        setEffect { Effect.ShowError }
+    }
+
+    private fun getAll(){
+        viewModelScope.launch {
+            getAllPosts(favorites = favorite)
+                .onSuccess { it.onEach(::updateState).collect() }
+                .onFailure { emitError() }
+        }
+    }
+
+    private fun refresh() {
+        viewModelScope.launch {
+            syncPosts().onFailure { emitError() }
+        }
+    }
+
+    private fun deleteAll() {
+        viewModelScope.launch {
+            deleteAllPosts().onFailure { emitError() }
+        }
     }
     //endregion
 }

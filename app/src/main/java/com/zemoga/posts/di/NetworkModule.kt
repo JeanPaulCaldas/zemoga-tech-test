@@ -2,10 +2,10 @@ package com.zemoga.posts.di
 
 import com.zemoga.core.data.author.AuthorRemoteSource
 import com.zemoga.core.data.post.PostRemoteSource
-import com.zemoga.posts.framework.AuthorRemoteImpl
-import com.zemoga.posts.framework.PostRemoteImpl
-import com.zemoga.posts.framework.server.AuthorService
-import com.zemoga.posts.framework.server.PostService
+import com.zemoga.posts.framework.author.AuthorRemoteImpl
+import com.zemoga.posts.framework.post.PostRemoteImpl
+import com.zemoga.posts.framework.retrofit.services.AuthorService
+import com.zemoga.posts.framework.retrofit.services.PostService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

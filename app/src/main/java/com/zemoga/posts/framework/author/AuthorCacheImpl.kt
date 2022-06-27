@@ -1,8 +1,10 @@
-package com.zemoga.posts.framework
+package com.zemoga.posts.framework.author
 
 import com.zemoga.core.data.author.AuthorCacheSource
 import com.zemoga.core.domain.Author
-import com.zemoga.posts.framework.database.AuthorDao
+import com.zemoga.posts.framework.room.daos.AuthorDao
+import com.zemoga.posts.framework.util.toDomain
+import com.zemoga.posts.framework.util.toRoom
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

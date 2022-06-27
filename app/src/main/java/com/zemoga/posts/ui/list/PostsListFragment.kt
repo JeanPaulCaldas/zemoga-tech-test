@@ -11,9 +11,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zemoga.posts.R
 import com.zemoga.posts.databinding.FragmentPostListBinding
-import com.zemoga.posts.ui.list.PostListViewModel.PostListEvent.DeleteAll
-import com.zemoga.posts.ui.list.PostListViewModel.PostListEvent.Refresh
 import com.zemoga.posts.ui.pager.PagerFragmentDirections
+import com.zemoga.posts.ui.util.visible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -34,6 +33,7 @@ class PostsListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        viewModel.setEvent(PostListContract.Event.GetAll)
     }
 
     override fun onCreateView(
@@ -51,7 +51,12 @@ class PostsListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.onEach { render(it) }.collect()
+                launch {
+                    viewModel.uiState.onEach(::render).collect()
+                }
+                launch {
+                    viewModel.effect.onEach(::handleEffect).collect()
+                }
             }
         }
     }
@@ -63,11 +68,11 @@ class PostsListFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_refresh -> {
-                viewModel.setEvent(Refresh)
+                viewModel.setEvent(PostListContract.Event.Refresh)
                 true
             }
             R.id.action_delete_all -> {
-                viewModel.setEvent(DeleteAll)
+                viewModel.setEvent(PostListContract.Event.DeleteAll)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -81,16 +86,31 @@ class PostsListFragment : Fragment() {
     //endregion
 
     //region Private Methods
-    private fun render(uiState: PostListViewModel.PostListUIState) {
-        when (uiState) {
-            is PostListViewModel.PostListUIState.Error -> showError()
-            is PostListViewModel.PostListUIState.Posts -> recyclerAdapter.submitList(uiState.posts)
+    private fun render(uiState: PostListContract.State) {
+        when (val state = uiState.state) {
+            PostListContract.PostListState.Idle -> {
+                binding.progress.visible = false
+            }
+            PostListContract.PostListState.Loading -> {
+                binding.progress.visible = true
+            }
+            is PostListContract.PostListState.Success -> {
+                binding.progress.visible = false
+                recyclerAdapter.submitList(state.posts)
+            }
         }
     }
 
-    private fun showError() {
-        Toast.makeText(requireContext(), getString(R.string.error_message), Toast.LENGTH_SHORT)
-            .show()
+    private fun handleEffect(effect: PostListContract.Effect) {
+        when (effect) {
+            PostListContract.Effect.ShowError -> {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.error_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     private fun goToPostDetail(postId: Int) {

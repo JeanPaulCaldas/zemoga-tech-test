@@ -1,8 +1,9 @@
-package com.zemoga.posts.framework
+package com.zemoga.posts.framework.post
 
 import com.zemoga.core.data.post.PostRemoteSource
 import com.zemoga.core.domain.Post
-import com.zemoga.posts.framework.server.PostService
+import com.zemoga.posts.framework.retrofit.services.PostService
+import com.zemoga.posts.framework.util.toDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

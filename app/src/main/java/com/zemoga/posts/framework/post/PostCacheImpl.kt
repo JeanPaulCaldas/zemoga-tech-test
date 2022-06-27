@@ -1,10 +1,10 @@
-package com.zemoga.posts.framework
+package com.zemoga.posts.framework.post
 
 import com.zemoga.core.data.post.PostCacheSource
-import com.zemoga.core.domain.Author
 import com.zemoga.core.domain.Post
-import com.zemoga.posts.framework.database.AuthorDao
-import com.zemoga.posts.framework.database.PostDao
+import com.zemoga.posts.framework.room.daos.PostDao
+import com.zemoga.posts.framework.util.toDomain
+import com.zemoga.posts.framework.util.toRoom
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

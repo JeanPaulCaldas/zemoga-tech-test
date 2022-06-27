@@ -1,5 +1,7 @@
-package com.zemoga.posts.framework.server
+package com.zemoga.posts.framework.retrofit.services
 
+import com.zemoga.posts.framework.retrofit.entities.Comment
+import com.zemoga.posts.framework.retrofit.entities.Post
 import retrofit2.http.GET
 import retrofit2.http.Path
 
